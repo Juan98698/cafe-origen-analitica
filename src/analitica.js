@@ -110,6 +110,33 @@ return porCiudad;
 
 }
 
+function unidadesPorProducto(ventas){
+  return ventas.reduce((porProducto,v) => {
+if(porProducto[v.producto] === undefined){
+  porProducto[v.producto] = 0;
+}
+porProducto[v.producto] += v.cantidad;
+  return porProducto;
+  },{});
+  
+}
+function topProductosPorValor(ventas, k) {
+  // Paso 1: Sumar el dinero generado por cada producto (ignorando ventas con cantidad <= 0)
+  const dineroPorProducto = ventas.reduce((acumulador, v) => {
+    if (v.cantidad > 0) {
+      if (acumulador[v.producto] === undefined) {
+        acumulador[v.producto] = 0;
+      }
+      acumulador[v.producto] += valorVenta(v);
+    }
+    return acumulador;
+  }, {});
+  
+  const ranking = Object.entries(dineroPorProducto).sort((a, b) => b[1] - a[1]);
+  const seleccionados = k !== undefined ? ranking.slice(0, k) : ranking;
+  return seleccionados.map(item => item[0]);
+}
+
 
 
 // ==========================================
@@ -148,7 +175,8 @@ console.log("Arreglo vacio (Medellin):", ventasPorCiudad(arregloVacio, "Medellí
 */
 
 module.exports = {totalVendido, totalVendidoM, unidadesVendidas, unidadesVendidasM,
-   ventaMayor, ticketPromedio, ventasPorCiudad, ventasPorCiudadM, valorVenta, totalPorCiudad, totalPorCiudadM
+   ventaMayor, ticketPromedio, ventasPorCiudad, ventasPorCiudadM, valorVenta, 
+   totalPorCiudad, totalPorCiudadM, unidadesPorProducto, topProductosPorValor
 };
 
 

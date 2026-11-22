@@ -112,3 +112,65 @@ Para comprobar que las funciones operan de forma correcta, realicé la verificac
 * **Resultado manual:** `$356.000`.
 * **Resultado del programa en Node.js:** `356000`.
 * **Conclusión:** Ambos resultados coinciden. Queda comprobado que la normalización funcionó con éxito, ya que el registro `id: 5` (que venía en minúscula `"medellín"`) fue sumado junto a los registros capitalizados (`id: 1`, `4` y `11`).
+
+---
+
+## Análisis funcional: Preguntas clave de la sesión
+
+A continuación se detalla cómo cada función aborda el procesamiento de datos respondiendo a las cinco preguntas esenciales del flujo analítico:
+
+### 1. `totalVendido` / `totalVendidoM`
+* **¿Qué recorro?** La lista completa de transacciones (`ventas`).
+* **¿Qué filtro?** Únicamente las ventas efectivas con `cantidad > 0` (excluyo ventas en cero o canceladas).
+* **¿Qué transformo?** Cada objeto de venta lo convierto a su valor monetario en pesos (`cantidad * precio`).
+* **¿Qué acumulo?** La suma acumulada de dinero en una variable numérica que inicia en `0`.
+* **¿Cómo agrupo?** No se agrupa; se consolida todo el arreglo en una sola cifra global de ingresos.
+
+### 2. `unidadesVendidas` / `unidadesVendidasM`
+* **¿Qué recorro?** El arreglo de `ventas`.
+* **¿Qué filtro?** Las ventas con `cantidad > 0`.
+* **¿Qué transformo?** Del registro de venta tomo solamente el número de unidades (`cantidad`).
+* **¿Qué acumulo?** La suma del número de unidades físicas entregadas (arrancando en `0`).
+* **¿Cómo agrupo?** No se agrupa; se reduce todo a un único número total de productos despachados.
+
+### 3. `ventaMayor`
+* **¿Qué recorro?** El arreglo de `ventas` (si está vacío, salgo inmediatamente con `null`).
+* **¿Qué filtro?** No hay filtro previo; voy comparando para descartar ventas que no superen el récord actual.
+* **¿Qué transformo?** Calculo el valor de la venta en curso (`cantidad * precio`) para contrastarlo contra el valor de la mayor encontrada hasta el momento.
+* **¿Qué acumulo?** No acumulo números; voy conservando y actualizando la referencia al *objeto completo de la venta más grande*.
+* **¿Cómo agrupo?** No se agrupa; localiza y retorna un único registro destacado.
+
+### 4. `ticketPromedio`
+* **¿Qué recorro?** La lista de `ventas`.
+* **¿Qué filtro?** Transacciones reales con `cantidad > 0` (así no divido entre transacciones vacías que alteren el promedio).
+* **¿Qué transformo?** Cada transacción válida a su total en dinero (`cantidad * precio`).
+* **¿Qué acumulo?** Dos valores simultáneos: el total acumulado de dinero y un contador de ventas válidas.
+* **¿Cómo agrupo?** No se agrupa; al final se calcula el promedio global dividiendo el dinero acumulado entre el total de transacciones válidas (`Math.round(acumulado / contador)`).
+
+### 5. `ventasPorCiudad` / `ventasPorCiudadM`
+* **¿Qué recorro?** La lista de `ventas`.
+* **¿Qué filtro?** Ventas con `cantidad > 0` cuya ciudad coincida exactamente con la buscada (aplicando `.trim().toLowerCase()` para evitar fallos por mayúsculas o espacios).
+* **¿Qué transformo?** Las ventas que pasaron el filtro a su valor monetario (`cantidad * precio`).
+* **¿Qué acumulo?** El dinero generado únicamente en esa ciudad elegida.
+* **¿Cómo agrupo?** No se agrupa en varias categorías; focaliza el cálculo en un único grupo (la ciudad consultada).
+
+### 6. `totalPorCiudad` / `totalPorCiudadM`
+* **¿Qué recorro?** Todo el arreglo de `ventas`.
+* **¿Qué filtro?** Transacciones válidas con `cantidad > 0`.
+* **¿Qué transformo?** El nombre de la ciudad a un formato estándar normalizado (`.trim().toLowerCase()`) y cada venta a su monto total en pesos.
+* **¿Qué acumulo?** El dinero vendido dentro de cada ciudad.
+* **¿Cómo agrupo?** En un **objeto acumulador** (`{}`). Cada clave es el nombre normalizado de una ciudad (ej. `'medellín'`, `'bogotá'`) y su valor es la suma acumulada de dinero en esa plaza.
+
+### 7. `unidadesPorProducto`
+* **¿Qué recorro?** El arreglo de `ventas`.
+* **¿Qué filtro?** Ventas válidas (`cantidad > 0`).
+* **¿Qué transformo?** De cada registro tomo el nombre exacto del producto y su cantidad vendida.
+* **¿Qué acumulo?** La cantidad física de unidades vendidas por cada producto.
+* **¿Cómo agrupo?** En un **objeto** (`{}`). Las claves son los nombres de los productos (ej. `'Origen Huila 500 g'`) y sus valores son las unidades totales sumadas.
+
+### 8. `topProductosPorValor`
+* **¿Qué recorro?** Primero el arreglo `ventas` para totalizar ingresos por producto, y luego el arreglo de parejas ordenadas para quedarme con los primeros `k`.
+* **¿Qué filtro?** Ignoro ventas no válidas (`cantidad <= 0`) y al final recorto con `.slice(0, k)` solo los `k` productos solicitados.
+* **¿Qué transformo?** Primero transformo ventas a ingresos por producto; luego el objeto a un arreglo con `Object.entries()`, y finalmente las parejas al solo nombre del producto con `.map()`.
+* **¿Qué acumulo?** En la primera fase con `.reduce()`, acumulo el dinero total generado por cada producto en un objeto.
+* **¿Cómo agrupo?** Agrupo por producto en un objeto, creo una copia independiente de la lista ordenada de mayor a menor ingreso (sin alterar el arreglo `ventas` original) y extraigo el podio solicitado.
