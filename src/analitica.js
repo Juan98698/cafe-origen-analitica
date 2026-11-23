@@ -137,6 +137,11 @@ function topProductosPorValor(ventas, k) {
   return seleccionados.map(item => item[0]);
 }
 
+function ventasDelDia(ventas, fecha){
+const porFecha = ventas.filter(v => v.fecha === fecha);
+return porFecha;
+}
+
 
 
 // ==========================================
@@ -176,7 +181,7 @@ console.log("Arreglo vacio (Medellin):", ventasPorCiudad(arregloVacio, "Medellí
 
 module.exports = {totalVendido, totalVendidoM, unidadesVendidas, unidadesVendidasM,
    ventaMayor, ticketPromedio, ventasPorCiudad, ventasPorCiudadM, valorVenta, 
-   totalPorCiudad, totalPorCiudadM, unidadesPorProducto, topProductosPorValor
+   totalPorCiudad, totalPorCiudadM, unidadesPorProducto, topProductosPorValor, ventasDelDia
 };
 
 

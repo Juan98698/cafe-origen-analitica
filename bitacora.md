@@ -174,3 +174,25 @@ A continuación se detalla cómo cada función aborda el procesamiento de datos 
 * **¿Qué transformo?** Primero transformo ventas a ingresos por producto; luego el objeto a un arreglo con `Object.entries()`, y finalmente las parejas al solo nombre del producto con `.map()`.
 * **¿Qué acumulo?** En la primera fase con `.reduce()`, acumulo el dinero total generado por cada producto en un objeto.
 * **¿Cómo agrupo?** Agrupo por producto en un objeto, creo una copia independiente de la lista ordenada de mayor a menor ingreso (sin alterar el arreglo `ventas` original) y extraigo el podio solicitado.
+
+---
+
+## Registro de Depuración Sistemática (MiniReto v0.1)
+
+Documentación de los dos problemas reportados por la gerencia en la versión preliminar, analizados bajo el formato de diagnóstico y solución:
+
+### 1. Duplicidad de ciudades en el consolidado ("Bogotá aparecía dos veces")
+* **Síntoma:** Al revisar el reporte de ventas por ciudad, la gerente notó que Bogotá aparecía listada en dos filas separadas.
+* **Entrada que lo produce:** Registros de venta donde la ciudad viene con diferencias de mayúsculas, minúsculas o espacios accidentales (ejemplo: `"Bogotá"` y `"bogotá"` o `"Bogotá "`).
+* **Hipótesis:** Como JavaScript distingue mayúsculas de minúsculas, el objeto acumulador no reconoció que era la misma ciudad y creó dos propiedades independientes.
+* **Prueba realizada:** Se procesó un arreglo de prueba con `"Bogotá"` y `"bogotá"` en la versión sin normalizar, confirmando que generaba `{ 'Bogotá': ..., 'bogotá': ... }`.
+* **Causa:** Las claves de un objeto en JavaScript son estrictas con el texto (`"Bogotá" !== "bogotá"`). Sin una limpieza previa, cada variación tipográfica genera una categoría distinta.
+* **Corrección:** En la función `totalPorCiudad` se aplicó una normalización obligatoria con `.trim().toLowerCase()`. Con esto, cualquier variación se transforma a minúsculas y sin espacios antes de acumular, agrupando todo bajo una única clave estándar.
+
+### 2. Indeterminación (`NaN`) en el Ticket Promedio para días sin ventas
+* **Síntoma:** Al filtrar el reporte por una fecha sin transacciones, el ticket promedio mostraba `NaN` en vez de un valor en dinero.
+* **Entrada que lo produce:** Ejecutar `ticketPromedio(ventasDelDia(ventas, "2026-09-15"))` con una fecha sin registros (un arreglo vacío `[]`).
+* **Hipótesis:** En un día sin ventas el dinero acumulado es 0 y el contador de ventas también es 0, lo que provoca una división de cero entre cero ($0 / 0$).
+* **Prueba realizada:** Se ejecutó `ticketPromedio([])` en la versión sin validación, comprobando que JavaScript evaluaba `0 / 0` y arrojaba `NaN`.
+* **Causa:** Matemáticamente la división $0 / 0$ es una indeterminación. En JavaScript, operar una división indeterminada produce el valor numérico especial `NaN` (*Not a Number*).
+* **Corrección:** Se implementó una cláusula de guarda al inicio del cálculo: `if (contador === 0) return 0;`. Si no hubo ventas, la función retorna inmediatamente `0`, permitiendo que el reporte muestre `$ 0` de manera limpia y sin errores.
