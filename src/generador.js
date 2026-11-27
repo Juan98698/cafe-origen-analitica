@@ -25,5 +25,5 @@ function generarVentas(n){
     }
     return ventas;
 }
-console.log(generarVentas(3));
+
 module.exports = { generarVentas };

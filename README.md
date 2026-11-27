@@ -32,7 +32,13 @@ Valida que las funciones analíticas (ciclos tradicionales vs. métodos funciona
 node src/verificar.js
 ```
 
-### 3. Exploración de datos crudos
+### 3. Medición de rendimiento y escalabilidad (Big O)
+Genera datos sintéticos a escala y mide el número de operaciones de las funciones:
+```bash
+node src/medir.js
+```
+
+### 4. Exploración de datos crudos
 Permite inspeccionar la estructura de los registros originales:
 ```bash
 node src/explorar.js
@@ -45,6 +51,8 @@ node src/explorar.js
 * **`src/datos.js`**: Conjunto de datos con los registros de ventas de la tienda.
 * **`src/analitica.js`**: Módulo central de funciones puras de procesamiento, cálculo de métricas y transformaciones.
 * **`src/reporte.js`**: Script de presentación ejecutiva que formatea los datos en consola para la gerencia.
+* **`src/generador.js`**: Generador de ventas aleatorias realistas para pruebas de escalabilidad.
+* **`src/medir.js`**: Banco de pruebas de complejidad algorítmica con funciones instrumentadas.
 * **`src/verificar.js`**: Script de pruebas automatizadas que compara implementaciones imperativas y declarativas.
 * **`src/explorar.js`**: Script de inspección inicial de datos.
-* **`bitacora.md`**: Registro exhaustivo con el diccionario de datos, decisiones de calidad, preguntas funcionales y la documentación sistemática de depuración de errores.
+* **`bitacora.md`**: Registro exhaustivo con el diccionario de datos, decisiones de calidad, preguntas funcionales, depuración sistemática y análisis Big O.

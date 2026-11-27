@@ -196,3 +196,38 @@ Documentación de los dos problemas reportados por la gerencia en la versión pr
 * **Prueba realizada:** Se ejecutó `ticketPromedio([])` en la versión sin validación, comprobando que JavaScript evaluaba `0 / 0` y arrojaba `NaN`.
 * **Causa:** Matemáticamente la división $0 / 0$ es una indeterminación. En JavaScript, operar una división indeterminada produce el valor numérico especial `NaN` (*Not a Number*).
 * **Corrección:** Se implementó una cláusula de guarda al inicio del cálculo: `if (contador === 0) return 0;`. Si no hubo ventas, la función retorna inmediatamente `0`, permitiendo que el reporte muestre `$ 0` de manera limpia y sin errores.
+
+---
+
+## Experimento de Escalabilidad y Complejidad Algorítmica (Big O)
+
+Para responder al líder técnico (*"¿cuánto crece el trabajo cuando crecen los datos?"*), construimos un generador de ventas sintéticas (`src/generador.js`) y un medidor de operaciones con un objeto contador por referencia en `src/medir.js`.
+
+### 1. Predicción previa (antes de medir)
+* **Funciones con ciclo (`totalVendido`, `ventaMayor`, `totalPorCiudad`):** Al recorrer la lista elemento por elemento, predijimos que **si los datos ($n$) se multiplican por 10, el trabajo se multiplicará exactamente por 10** (crecimiento lineal).
+* **Función de acceso directo (`primeraVenta`):** Como solo toma la primera posición (`ventas[0]`), predijimos que **las operaciones se mantendrían fijas en 1**, sin importar el tamaño del arreglo (crecimiento constante).
+
+---
+
+### 2. Tabla de mediciones reales (`src/medir.js`)
+
+Ejecutamos el banco de pruebas con 100, 1.000, 10.000 y 100.000 registros:
+
+| Tamaño ($n$) | `primeraVenta` | `totalVendido` | `ventaMayor` | `totalPorCiudad` |
+| :---: | :---: | :---: | :---: | :---: |
+| **100** | 1 | 100 | 100 | 100 |
+| **1.000** | 1 | 1.000 | 1.000 | 1.000 |
+| **10.000** | 1 | 10.000 | 10.000 | 10.000 |
+| **100.000** | 1 | 100.000 | 100.000 | 100.000 |
+
+---
+
+### 3. Comparación y Clasificación Big O
+
+* **`primeraVenta` $\rightarrow O(1)$ (Complejidad Constante):**
+  * *En los números:* Aunque los datos crecieron 1.000 veces (de 100 a 100.000), el contador jamás se movió de 1.
+  * *En el código:* No tiene ciclos; lee directamente la dirección de memoria `ventas[0]` en un solo paso instantáneo.
+
+* **`totalVendido`, `ventaMayor` y `totalPorCiudad` $\rightarrow O(n)$ (Complejidad Lineal):**
+  * *En los números:* Las operaciones crecieron en relación 1 a 1 respecto al tamaño de los datos. Si multiplicamos los datos por 10, el esfuerzo fue exactamente 10 veces mayor.
+  * *En el código:* Cada una tiene un solo ciclo (`for...of` o `.reduce`) que visita cada venta una única vez. Al no tener ciclos anidados (un ciclo dentro de otro), el trabajo jamás se dispara a $O(n^2)$.
